@@ -1,24 +1,23 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
+import { useEffect, useState } from 'react';
+import { getRequest, SHARES_MOEX_API } from './utils/api';
+
+import { Instruments } from './components/instruments/instruments';
+
+
 function App() {
+  const [marketData, setMarketData] = useState();
+
+  useEffect(() => {
+    getRequest(SHARES_MOEX_API, setMarketData)
+  }, []);
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      { marketData && <Instruments data={marketData} />} 
     </div>
   );
 }
