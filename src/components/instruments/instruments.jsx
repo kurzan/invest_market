@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import styles from './instruments.module.css';
+import { useSearchParams } from 'react-router-dom';
 
 export const InstrumentElement = ({instruments}) => {
 
@@ -17,6 +18,16 @@ export const InstrumentElement = ({instruments}) => {
 }
 
 export const Instruments = ({ data }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const onChange = e => {
+    let filter = e.target.value;
+    if (filter) {
+        setSearchParams({ filter });
+    } else {
+        setSearchParams({});
+    }
+  };
 
   const marketDataColumns = data.marketdata.columns;
   const marketDataRows = data.marketdata.data;
@@ -26,23 +37,38 @@ export const Instruments = ({ data }) => {
   const securitiesDataRows = data.securities.data;
   const mergedSecuritiesData = securitiesDataRows.map(row => securitiesDataColumns.reduce((obj, key, index) => ({ ...obj, [key]: row[index] }), {}));
 
-  const mergedInstruments = [];
+  const mergedInstruments = useMemo(
+    () => {
+      const instruments = [];
 
-  for (let i = 0; i < mergedMarketData.length; i++) {
-    mergedInstruments.push({
-      ...mergedMarketData[i],
-      ...(mergedSecuritiesData.find((itmInner) => itmInner.SECID === mergedMarketData[i].SECID))
-    }
-    );
-  }
+      for (let i = 0; i < mergedMarketData.length; i++) {
+        instruments.push({
+          ...mergedMarketData[i],
+          ...(mergedSecuritiesData.find((itmInner) => itmInner.SECID === mergedMarketData[i].SECID))
+        }
+        );
+      }
 
-  const volumeSorted = mergedInstruments.sort((prev, next) => next.VALTODAY_RUR - prev.VALTODAY_RUR);
+      return instruments;
+    }, [mergedMarketData, mergedSecuritiesData]
+  )
 
+  const volumeSorted = mergedInstruments.slice().sort((prev, next) => next.VALTODAY_RUR - prev.VALTODAY_RUR);
 
+  const filteredData = useMemo(
+    () => {
+      const searchValue = searchParams.get('filter') || '';
+      return mergedInstruments.filter(
+        item => item.SHORTNAME.toLocaleLowerCase().indexOf(searchValue.toLocaleLowerCase()) > -1
+      );
+    },
+    [mergedInstruments, searchParams]
+  ); 
 
   return (
 
   <div className={styles.container}>
+    <input placeholder="Поиск" onChange={onChange} value={searchParams.get('filter') || ''} />
     <table>
       <thead>
         <tr>
@@ -55,7 +81,7 @@ export const Instruments = ({ data }) => {
         </tr>
       </thead>
       <tbody>
-        { volumeSorted.map((item, index) => item.LAST > 0 && <InstrumentElement key={index} instruments={item} />)}
+        { filteredData.map((item, index) => item.LAST > 0 && <InstrumentElement key={index} instruments={item} />)}
       </tbody>
     </table>
   </div>
