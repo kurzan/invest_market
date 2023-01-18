@@ -1,13 +1,13 @@
 
 table {
-  width: 800px;
+  width: 900px;
   border-collapse: collapse;
   overflow: hidden;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 th,
 td {
-  padding: 15px;
+  padding: 8px;
   background-color: rgba(255, 255, 255, 0.2);
   color: black;
   text-align: left;
@@ -27,7 +27,6 @@ tbody td {
 }
 
 .icon {
-  border-radius: 5;
   width: 32px;
   height: 32px;
   margin-right: 6px;
@@ -37,9 +36,31 @@ tbody td {
 .shortname {
   display: flex;
   align-items: center;
-  
 }
 
 .container {
  margin: 0 auto;
+ 
+}
+
+.rating_result {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+	width: 180px;
+	margin: 0 auto;
+}
+.rating_result span {
+	padding: 0;
+	font-size: 32px;
+	margin: 0 3px;
+	line-height: 1;
+	color: lightgrey;
+  margin-right: 10px;
+}
+.rating_result > span:before {
+	content: '★';
+}
+.rating_result > span.active {
+	color: #55608f;
 }
