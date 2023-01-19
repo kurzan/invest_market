@@ -13,6 +13,11 @@ function App() {
   const [favoriteInsruments, setFavoriteInstruments ] = useState([]);
 
   useEffect(() => {
+    const fromLocalStorage = JSON.parse(window.localStorage.getItem('favorites'));
+    setFavoriteInstruments(fromLocalStorage ? fromLocalStorage : []);
+  }, []);
+
+  useEffect(() => {
     getRequest(SHARES_MOEX_API, setMarketDataShares)
   }, []);
 

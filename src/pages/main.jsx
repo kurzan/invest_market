@@ -4,14 +4,10 @@ import { Instruments, FavoriteInstruments } from '../components/instruments/inst
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import { FavoriteInstrumentsContext } from '../services/appContext';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 
 export const Main = ({shares, ofz}) => {
-  const { favoriteInsruments, setFavoriteInstruments } = useContext(FavoriteInstrumentsContext);
-
-  useEffect(() => {
-    console.log(favoriteInsruments)
-  }, []);
+  const { favoriteInsruments } = useContext(FavoriteInstrumentsContext);
 
   return (
     <div className={styles.container}>
@@ -23,7 +19,7 @@ export const Main = ({shares, ofz}) => {
         </TabList>
 
         <TabPanel>
-          { favoriteInsruments.length && <FavoriteInstruments data={favoriteInsruments} />}
+          { favoriteInsruments && favoriteInsruments.length && <FavoriteInstruments data={favoriteInsruments} />}
         </TabPanel>
         <TabPanel>
           { shares && <Instruments data={shares} />}

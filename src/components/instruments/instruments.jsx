@@ -1,11 +1,15 @@
-import { useState, useMemo, useContext } from 'react';
+import { useState, useMemo, useContext, useEffect } from 'react';
 import styles from './instruments.module.css';
 import { useSearchParams } from 'react-router-dom';
 import { FavoriteInstrumentsContext } from '../../services/appContext';
 
-export const InstrumentElement = ({instrument, onClick}) => {
+export const InstrumentElement = ({instrument, isChecked}) => {
   const { favoriteInsruments, setFavoriteInstruments } = useContext(FavoriteInstrumentsContext);
   const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    setChecked(isChecked);
+  }, [isChecked])
 
   const symbol = instrument.BOARDID === 'TQOB' ? '%' : '₽';
   const changeStyle = instrument.LASTTOPREVPRICE >= 0 ? { color: 'green' } : { color: 'red' };
@@ -19,11 +23,11 @@ export const InstrumentElement = ({instrument, onClick}) => {
       
     return `./images/isins/${instrument.ISIN}.png`
   }
-  
+
   const checkHandler = () => {
-    onClick();
-    setChecked(!checked);
-    setFavoriteInstruments([...favoriteInsruments, instrument])
+    setChecked(!checked)
+    setFavoriteInstruments([...favoriteInsruments, instrument]);
+    window.localStorage.setItem('favorites', JSON.stringify([...favoriteInsruments, instrument]));
   }
 
   return (
@@ -44,6 +48,7 @@ export const InstrumentElement = ({instrument, onClick}) => {
 
 export const Instruments = ({ data }) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { favoriteInsruments } = useContext(FavoriteInstrumentsContext);
 
   const onChange = e => {
     let filter = e.target.value;
@@ -90,7 +95,13 @@ export const Instruments = ({ data }) => {
     [volumeSorted, searchParams]
   ); 
 
-  const onInstrumentClick = () => {
+  const isChecked = (item) => {
+
+    for (let i=0; i < favoriteInsruments.length; i++) {
+      if (favoriteInsruments[i].SECID === item.SECID) {
+        return true;;
+      }
+    }
   }
 
   return (
@@ -109,7 +120,7 @@ export const Instruments = ({ data }) => {
         </tr>
       </thead>
       <tbody>
-        { filteredData.map((item, index) => item.LAST > 0 && <InstrumentElement key={item.ISIN} instrument={item} onClick={onInstrumentClick} />)}
+        { filteredData.map((item) => item.LAST > 0 && <InstrumentElement key={item.SECID} instrument={item} isChecked={isChecked(item)} />)}
       </tbody>
     </table>
   </div>
@@ -143,7 +154,13 @@ export const FavoriteInstruments = () => {
     [volumeSorted, searchParams]
   ); 
 
-  const onInstrumentClick = () => {
+  const isChecked = (item) => {
+
+    for (let i=0; i < favoriteInsruments.length; i++) {
+      if (favoriteInsruments[i].SECID === item.SECID) {
+        return true;;
+      }
+    }
   }
 
   return (
@@ -162,7 +179,7 @@ export const FavoriteInstruments = () => {
         </tr>
       </thead>
       <tbody>
-        { filteredData.map((item, index) => item.LAST > 0 && <InstrumentElement key={item.ISIN} instrument={item} onClick={onInstrumentClick} />)}
+        { filteredData.map((item, index) => item.LAST > 0 && <InstrumentElement key={item.ISIN} instrument={item} isChecked={isChecked(item)} />)}
       </tbody>
     </table>
   </div>
